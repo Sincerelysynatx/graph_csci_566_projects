@@ -42,10 +42,13 @@ function main() {
         return;
     }
 
+    // Initializing the shaders
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
         console.log('Failed to intialize shaders.');
         return;
     }
+
+    // Getting all the uniforms and attribute locations from the gpu.
 
     var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
     if (a_Position < 0) {
@@ -67,6 +70,8 @@ function main() {
 
     var timer = { time:0 };
 
+    // Registering click events and binding them to functions
+
     canvas.onmousedown = function(ev){ click(ev, canvas, timer) };
 
     canvas.onmouseup = function(){ clickUp(gl,
@@ -81,6 +86,8 @@ function main() {
     // Clear <canvas>
     gl.clear(gl.COLOR_BUFFER_BIT);
 }
+
+// Global arrays used for referencing in different locations
 
 var g_points = [];
 var g_colors = [];
