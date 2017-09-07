@@ -1,12 +1,12 @@
 // ColoredPoint.js (c) 2012 matsuda
 // Vertex shader program
 
-//attribute int point_size
 var VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
+    'attribute float psize;\n' +
     'void main() {\n' +
     '  gl_Position = a_Position;\n' +
-    '  gl_PointSize = 10.0;\n' +
+    '  gl_PointSize = psize;\n' +
     '}\n';
 
 
@@ -43,11 +43,17 @@ function main() {
         return;
     }
 
+    var psize = gl.getAttribLocation(gl.program, 'psize');
+    if (psize < 0){
+        console.log('Failed to get the storage location of psize');
+        return;
+    }
+
     var timer = { time:0 };
 
     canvas.onmousedown = function(ev){ click(ev, canvas, timer) };
 
-    canvas.onmouseup = function(){ clickUp(gl,  a_Position, u_FragColor, timer) };
+    canvas.onmouseup = function(){ clickUp(gl, a_Position, u_FragColor, psize, timer) };
 
     // Specify the color for clearing <canvas>
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -88,8 +94,9 @@ function click(ev, canvas, timer) {
     g_colors.push([r, g, b, a]);
 }
 
-function clickUp(gl, a_Position, u_FragColor, timer) {
-    console.log(Date.now() - timer.time);
+function clickUp(gl, a_Position, u_FragColor, psize, timer) {
+    var duration = Date.now() - timer.time
+    console.log(duration);
     // Clear <canvas>
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -100,6 +107,8 @@ function clickUp(gl, a_Position, u_FragColor, timer) {
 
         // Pass the position of a point to a_Position variable
         gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
+
+        gl.vertexAttrib1f(psize, duration/100.0);
         // Pass the color of a point to u_FragColor variable
         gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
         // Draw
