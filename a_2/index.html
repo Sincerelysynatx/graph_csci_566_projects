@@ -1,27 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Assigment 1</title>
+    <title>Assigment 2</title>
 </head>
 <body onload="main()">
-    <h3>Instructions:</h3>
-    <h4>Click on the canvas to spawn a dot. The longer you hold the larger
-        the dot becomes.</h4>
-    <h3>Goal:</h3>
-    <h4>Demonstrate a simulated interpolation whilst having varying vertex
-        sizes.</h4>
+    <h4>Instructions:</h4>
+    <h5>Click on the canvas to spawn a dot. The longer you hold the larger
+        the dot becomes.</h5>
+    <h4>Goal:</h4>
+    <h5>Demonstrate a simulated interpolation whilst having varying vertex
+        sizes.</h5>
     <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
     </canvas>
+    <br />
 
+    <button type="button" id="toggle">Toggle Background</button>
+    <br/>
+    <button type="button" id="left">Move Left</button>
+    <button type="button" id="right">Move Right</button>
 
-<script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/cuon-utils.js"></script>
-    <script src="a_1.js"></script>
+    <script src="a_2.js"></script>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
 </body>
 </html>

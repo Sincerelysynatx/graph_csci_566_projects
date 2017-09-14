@@ -1,176 +1,381 @@
-/*
- * @author: Sean Pimentel
- * @date: 08/7/2017
- * @description: This program is supposed to simulate interpolation as well as
- * demonstrate varying point sizes.
- *
+/**
+ * a_2.js
+ * @fileoverview Not sure yet
+ * @author Sean Pimentel
  */
 
-/*
- * Vertex Shader Code
- * creating a position attribute and a pointer size attribute per vertex
- */
-var VSHADER_SOURCE =
-    'attribute vec4 a_Position;\n' +
-    'attribute float psize;\n' +
-    'void main() {\n' +
-    '  gl_Position = a_Position;\n' +
-    '  gl_PointSize = psize;\n' +
-    '}\n';
+"use strict";
 
-/*
- * Fragment Shader Code
- * Setting up a uniform fragment shader variable that does not change
- */
-var FSHADER_SOURCE =
-    'precision mediump float;\n' +
-    'uniform vec4 u_FragColor;\n' +
-    'void main() {\n' +
-    '  gl_FragColor = u_FragColor;\n' +
-    '}\n';
-
-/*
- * Main loop to get gl contex, attributes and uniforms from shaders, set mouse
- * down and mouse up events, and clearing the canvas
- */
 function main() {
-    var canvas = document.getElementById('webgl');
 
+    // vertex shader program
+    var VSHADER_SOURCE =
+        'attribute vec4 a_Position;\n' +
+        'uniform float u_xTranslate;\n' +
+        'uniform float u_yTranslate;\n' +
+        'void main() {\n' +
+        '  gl_Position = vec4(a_Position.x + u_xTranslate, a_Position.y + u_yTranslate, a_Position.zw);\n' +
+        '}\n';
+
+    // fragment shader program
+    var FSHADER_SOURCE =
+        'precision mediump float;\n' +
+        'uniform vec4 u_Color;\n' +
+        'void main() {\n' +
+        '  gl_FragColor = u_Color;\n' +
+        '}\n';
+
+    // shader vars
+    var shaderVars = {
+        u_xTranslate:0,      // location of uniform for x translate in shader
+        u_yTranslate:0,      // location of uniform for y translate in shader
+        a_Position:0,        // location of attribute for position in shader
+        u_Color:0            // location of uniform for color in shader
+    };
+
+    // a triangle object
+    var quad_points = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: 0,
+        yTranslate: 0.7,
+        buffer: 0
+    };
+
+    // a quad object
+    var quad_line_strip = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: 0.5,
+        yTranslate: 0.5,
+        buffer: 0
+    };
+
+    var quad_line_loop = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: 0.5,
+        yTranslate: 0,
+        buffer: 0
+    };
+
+    var quad_lines = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: 0.5,
+        yTranslate: -0.5,
+        buffer: 0
+    };
+
+    var quad_triangle_strip = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: -0.5,
+        yTranslate: -0.5,
+        buffer: 0
+    };
+
+    var quad_triangle_fan = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: -0.5,
+        yTranslate: 0,
+        buffer: 0
+    };
+
+    var quad_triangles = {
+        vertices:   new Float32Array([
+            -0.2,  0.2,
+            -0.2, -0.2,
+            0.2,  0.2,
+            0.2, -0.2
+        ]),
+        n: 4,
+        xTranslate: -0.5,
+        yTranslate: 0.5,
+        buffer: 0
+    };
+
+    // get WebGL rendering context
+    var canvas = document.getElementById('webgl');
     var gl = getWebGLContext(canvas);
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
         return;
     }
 
-    // Initializing the shaders
+    // set up toggle button
+    // var toggleButton = document.getElementById('toggle');
+    // var whiteBG = true;
+    // var toggleBackground = function(){
+    //     if (whiteBG)
+    //         gl.clearColor(0, 0, 0, 1);
+    //     else
+    //         gl.clearColor(1, 1, 1, 1);
+    //     whiteBG = !whiteBG;
+    //     render(gl, shaderVars, triangle, quad);
+    // }
+    // toggleButton.onclick = toggleBackground;
+    //
+    // // set up left button
+    // var leftButton = document.getElementById('left');
+    // var moveLeft = function(){
+    //     triangle.xTranslate -= 0.1;
+    //     render(gl, shaderVars, triangle, quad);
+    // }
+    // leftButton.onclick = moveLeft;
+    //
+    // // set up right button
+    // var rightButton = document.getElementById('right');
+    // var moveRight = function(){
+    //     triangle.xTranslate += 0.1;
+    //     render(gl, shaderVars, triangle, quad);
+    // }
+    // rightButton.onclick = moveRight;
+
+    // set up shaders & locations of shader variables
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
         console.log('Failed to intialize shaders.');
         return;
     }
-
-    // Getting all the uniforms and attribute locations from the gpu.
-
-    var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-    if (a_Position < 0) {
+    shaderVars.u_xTranslate = gl.getUniformLocation(gl.program, 'u_xTranslate');
+    if (!shaderVars.u_xTranslate) {
+        console.log('Failed to get the storage location of u_xformMatrix');
+        return;
+    }
+    shaderVars.u_yTranslate = gl.getUniformLocation(gl.program, 'u_yTranslate');
+    if (!shaderVars.u_yTranslate) {
+        console.log('Failed to get the storage location of u_yformMatrix');
+        return;
+    }
+    shaderVars.a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+    if (shaderVars.a_Position < 0) {
         console.log('Failed to get the storage location of a_Position');
+        return -1;
+    }
+    shaderVars.u_Color = gl.getUniformLocation(gl.program, 'u_Color');
+    if (shaderVars.u_Color < 0) {
+        console.log('Failed to get the storage location of u_Color');
+        return -1;
+    }
+
+    // set up models
+    var n = initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
+    if (n < 0) {
+        console.log('Failed to initialize models');
         return;
     }
 
-    var u_FragColor = gl.getUniformLocation(gl.program, 'u_FragColor');
-    if (!u_FragColor) {
-        console.log('Failed to get the storage location of u_FragColor');
-        return;
-    }
-
-    var psize = gl.getAttribLocation(gl.program, 'psize');
-    if (psize < 0){
-        console.log('Failed to get the storage location of psize');
-        return;
-    }
-
-    var timer = { time:0 };
-
-    // Registering click events and binding them to functions
-
-    canvas.onmousedown = function(ev){ click(ev, canvas, timer) };
-
-    canvas.onmouseup = function(){ clickUp(gl,
-                                            a_Position,
-                                            u_FragColor,
-                                            psize,
-                                            timer) };
-
-    // Specify the color for clearing <canvas>
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-    // Clear <canvas>
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    // draw first time - subsequent draws are event driven
+    render(gl, shaderVars,  quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
 }
 
-// Global arrays used for referencing in different locations
-
-var g_points = [];
-var g_colors = [];
-var g_psize = [];
-
-/*
- * Function call for a mouse down event
- *
- * This function adds to the g_points and g_colors array for adding a point
-  * to be rendered. Determines the location of the point in our viewing area.
- *
- * @param ev for event from mouse click
- * @param canvas element
- * @param timer for starting the time on mouse down
+/**
+ * render - renders the scene using WebGL
+ * @param {Object} gl - the WebGL rendering context
+ * @param {Object} shaderVars - the locations of shader variables
+ * @param {Object} quad_points - the triangle to be rendered
+ * @param {Object} quad_lines - the triangle to be rendered
+ * @param {Object} quad_line_strip - the triangle to be rendered
+ * @param {Object} quad_line_loop - the triangle to be rendered
+ * @param {Object} quad_triangles - the triangle to be rendered
+ * @param {Object} quad_triangle_fan - the triangle to be rendered
+ * @param {Object} quad_triangle_strip - the triangle to be rendered
  */
-function click(ev, canvas, timer) {
-    timer.time = Date.now();
+function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip) {
 
-    var x = ev.clientX;
-    var y = ev.clientY;
-    var rect = ev.target.getBoundingClientRect();
+    gl.clearColor(1, 1, 1, 1);
 
-    x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
-    y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
-
-    // Store the coordinates to g_points array
-    console.log(x, y);
-    g_points.push([x, y]);
-
-    var r = (2.83 - Math.sqrt(((-1.0 - x)^2) + ((1.0 - y)^2)))/2.83;
-    var g = (2.83 - Math.sqrt(((1.0 - x)^2)+ ((1.0 - y)^2)))/2.83;
-    var b = (2.83 - Math.sqrt(((1.0 - x)^2) + ((-1.0 - y)^2)))/2.83;
-    var a = (2.83 - Math.sqrt(((-1.0 - x)^2) + ((-1.0 - y)^2)))/2.83;
-
-    // var r = ((-.62^x)-.62)/2 + ((.62^y)-.62)/2;
-    // var g = ((.62^x)-.62)/2 + ((.62^y)-.62)/2;
-    // var b = ((.62^x)-.62)/2 + ((-.62^y)-.62)/2;
-    // var a = ((-.62^x)-.62)/2 + ((-.62^y)-.62)/2;
-
-    console.log(r, g, b, a);
-
-    g_colors.push([r, g, b, a]);
-}
-
-
-/*
- * Function call for mouse up event
- *
- * This function sets the ending time for the timer and uses a simple
-  * algorithm to determine the size of the point. Also this function is
-   * responsible for rendering out the points to the canvas through the gl
-    * context.
- *
- * @param gl context
- * @param a_Position identifier for the space in hardware to set a vertex
-  * position
- * @param u_FragColor identifier for the space in hardware to set a fragment
-  * color
- * @param psize identifier for the space in hardware to set a pixel size
- * @param timer used to finish a time stamp and determine how large the
-  * pixel should be
- */
-function clickUp(gl, a_Position, u_FragColor, psize, timer) {
-    var duration = Date.now() - timer.time;
-    console.log(duration);
-
-    g_psize.push(duration/8);
-    // Clear <canvas>
+    // clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    var len = g_points.length;
-    for(var i = 0; i < len; i++) {
-        var xy = g_points[i];
-        var rgba = g_colors[i];
-        var point_size = g_psize[i];
+    // draw quad_points
+    gl.uniform4f(shaderVars.u_Color, 0, .3, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_points.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_points.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_points.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.POINTS, 0, quad_points.n);
 
-        // Pass the position of a point to a_Position variable
-        gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
-        // Pass the pixel size of a point to psize variable
-        gl.vertexAttrib1f(psize, point_size);
-        // Pass the color of a point to u_FragColor variable
-        gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
-        // Draw
-        gl.drawArrays(gl.POINTS, 0, 1);
+    // draw quad_lines
+    gl.uniform4f(shaderVars.u_Color, 0, .4, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_lines.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_lines.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_lines.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.LINES, 0, quad_lines.n);
+
+    // draw quad_line_strip
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_line_strip.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_line_strip.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_strip.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.LINE_STRIP, 0, quad_line_strip.n);
+
+    // draw quad_line_loop
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_line_loop.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_line_loop.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_loop.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.LINE_LOOP, 0, quad_line_loop.n);
+
+    // draw quad_triangles
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_triangles.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_triangles.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangles.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, quad_triangles.n);
+
+    // draw quad_triangle_fan
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_fan.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_fan.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_fan.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, quad_triangle_fan.n);
+
+    // draw quad_triangle_strip
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_strip.xTranslate);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_strip.yTranslate);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_strip.buffer);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, quad_triangle_strip.n);
+
+}
+
+/**
+ * initModels - initializes WebGL buffers for the the triangle & quad
+ * @param {Object} gl - the WebGL rendering context
+ * @param {Object} shaderVars - the locations of shader variables
+ * @param {Object} quad_points - the triangle to be rendered
+ * @param {Object} quad_lines - the quad to be rendered
+ * @param {Object} quad_line_strip - the quad to be rendered
+ * @param {Object} quad_line_loop - the quad to be rendered
+ * @param {Object} quad_triangles - the quad to be rendered
+ * @param {Object} quad_triangle_fan - the quad to be rendered
+ * @param {Object} quad_triangle_strip - the quad to be rendered
+ * @returns {Boolean}
+ */
+function initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip) {
+
+    // set up the quad
+    quad_points.buffer = gl.createBuffer();
+    if (!quad_points.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
     }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_points.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_points.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_lines.buffer = gl.createBuffer();
+    if (!quad_lines.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_lines.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_lines.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_line_strip.buffer = gl.createBuffer();
+    if (!quad_line_strip.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_strip.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_line_strip.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_line_loop.buffer = gl.createBuffer();
+    if (!quad_line_loop.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_loop.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_line_loop.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_triangles.buffer = gl.createBuffer();
+    if (!quad_triangles.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangles.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_triangles.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_triangle_fan.buffer = gl.createBuffer();
+    if (!quad_triangle_fan.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_fan.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_triangle_fan.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    quad_triangle_strip.buffer = gl.createBuffer();
+    if (!quad_triangle_strip.buffer) {
+        console.log('Failed to create buffer object for quad');
+        return false;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_strip.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, quad_triangle_strip.vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderVars.a_Position);
+
+    return true;
 }
