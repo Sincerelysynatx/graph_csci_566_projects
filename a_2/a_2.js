@@ -229,7 +229,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.POINTS, 0, quad_points.n);
 
     // draw quad_lines
-    gl.uniform4f(shaderVars.u_Color, 0, .4, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .4, .6, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_lines.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_lines.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_lines.buffer);
@@ -238,7 +238,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.LINES, 0, quad_lines.n);
 
     // draw quad_line_strip
-    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .5, .5, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_line_strip.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_line_strip.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_strip.buffer);
@@ -247,7 +247,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.LINE_STRIP, 0, quad_line_strip.n);
 
     // draw quad_line_loop
-    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .6, .4, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_line_loop.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_line_loop.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_loop.buffer);
@@ -256,7 +256,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.LINE_LOOP, 0, quad_line_loop.n);
 
     // draw quad_triangles
-    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .7, .3, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_triangles.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_triangles.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangles.buffer);
@@ -265,7 +265,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.TRIANGLES, 0, quad_triangles.n);
 
     // draw quad_triangle_fan
-    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .8, .2, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_fan.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_fan.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_fan.buffer);
@@ -274,7 +274,7 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
     gl.drawArrays(gl.TRIANGLE_FAN, 0, quad_triangle_fan.n);
 
     // draw quad_triangle_strip
-    gl.uniform4f(shaderVars.u_Color, 0, .5, .7, 1);
+    gl.uniform4f(shaderVars.u_Color, 0, .9, .1, 1);
     gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_strip.xTranslate);
     gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_strip.yTranslate);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_strip.buffer);
