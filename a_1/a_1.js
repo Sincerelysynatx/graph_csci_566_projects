@@ -114,12 +114,13 @@ function click(ev, canvas, timer) {
     y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
 
     // Store the coordinates to g_points array
+    console.log(x, y);
     g_points.push([x, y]);
 
-    var r = ((-.5*x)+.5)/2 + ((.5*y)+.5)/2;
-    var g = ((.5*x)+.5)/2 + ((.5*y)+.5)/2;
-    var b = ((.5*x)+.5)/2 + ((-.5*y)+.5)/2;
-    var a = ((-.5*x)+.5)/2 + ((-.5*y)+.5)/2;
+    var r = (2.83 - Math.sqrt(((-1.0 - x)^2) + ((1.0 - y)^2)))/2.83;
+    var g = (2.83 - Math.sqrt(((1.0 - x)^2)+ ((1.0 - y)^2)))/2.83;
+    var b = (2.83 - Math.sqrt(((1.0 - x)^2) + ((-1.0 - y)^2)))/2.83;
+    var a = (2.83 - Math.sqrt(((-1.0 - x)^2) + ((-1.0 - y)^2)))/2.83;
 
     // var r = ((-.62^x)-.62)/2 + ((.62^y)-.62)/2;
     // var g = ((.62^x)-.62)/2 + ((.62^y)-.62)/2;
