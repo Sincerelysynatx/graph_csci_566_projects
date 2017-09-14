@@ -6,6 +6,8 @@
 
 "use strict";
 
+var scale = 0;
+
 function main() {
 
     // vertex shader program
@@ -97,7 +99,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: -0.5,
-        buffer: 0
+        buffer: 1
     };
 
     var quad_triangle_fan = {
@@ -110,7 +112,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: 0,
-        buffer: 0
+        buffer: 1
     };
 
     var quad_triangles = {
@@ -123,7 +125,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: 0.5,
-        buffer: 0
+        buffer: 1
     };
 
     // get WebGL rendering context
@@ -133,6 +135,7 @@ function main() {
         console.log('Failed to get the rendering context for WebGL');
         return;
     }
+
 
     // set up toggle button
     // var toggleButton = document.getElementById('toggle');
@@ -147,21 +150,22 @@ function main() {
     // }
     // toggleButton.onclick = toggleBackground;
     //
-    // // set up left button
-    // var leftButton = document.getElementById('left');
-    // var moveLeft = function(){
-    //     triangle.xTranslate -= 0.1;
-    //     render(gl, shaderVars, triangle, quad);
-    // }
-    // leftButton.onclick = moveLeft;
-    //
-    // // set up right button
-    // var rightButton = document.getElementById('right');
-    // var moveRight = function(){
-    //     triangle.xTranslate += 0.1;
-    //     render(gl, shaderVars, triangle, quad);
-    // }
-    // rightButton.onclick = moveRight;
+
+    // set up left button
+    var leftButton = document.getElementById('left');
+    var moveLeft = function(){
+        triangle.xTranslate -= 0.1;
+        render(gl, shaderVars, triangle, quad);
+    }
+    leftButton.onclick = moveLeft;
+
+    // set up right button
+    var rightButton = document.getElementById('right');
+    var moveRight = function(){
+        triangle.xTranslate += 0.1;
+        render(gl, shaderVars, triangle, quad);
+    }
+    rightButton.onclick = moveRight;
 
     // set up shaders & locations of shader variables
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
