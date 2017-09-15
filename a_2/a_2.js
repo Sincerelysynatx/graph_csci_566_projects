@@ -1,22 +1,27 @@
 /**
  * a_2.js
- * @fileoverview Not sure yet
+ * @fileoverview Demonstrates different kinds of rendering while having user
+ * inputs. Not that creative, looking forward to the next project.
  * @author Sean Pimentel
  */
 
 "use strict";
 
-var scale = 0;
+var scale = 1;
+/**
+ * main function
+ * @returns {number}
+ */
 
 function main() {
-
     // vertex shader program
     var VSHADER_SOURCE =
         'attribute vec4 a_Position;\n' +
         'uniform float u_xTranslate;\n' +
         'uniform float u_yTranslate;\n' +
         'void main() {\n' +
-        '  gl_Position = vec4(a_Position.x + u_xTranslate, a_Position.y + u_yTranslate, a_Position.zw);\n' +
+        '  gl_Position = vec4(a_Position.x + u_xTranslate, a_Position.y + ' +
+        'u_yTranslate, a_Position.zw);\n' +
         '}\n';
 
     // fragment shader program
@@ -99,7 +104,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: -0.5,
-        buffer: 1
+        buffer: 0
     };
 
     var quad_triangle_fan = {
@@ -112,7 +117,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: 0,
-        buffer: 1
+        buffer: 0
     };
 
     var quad_triangles = {
@@ -125,7 +130,7 @@ function main() {
         n: 4,
         xTranslate: -0.5,
         yTranslate: 0.5,
-        buffer: 1
+        buffer: 0
     };
 
     // get WebGL rendering context
@@ -136,34 +141,25 @@ function main() {
         return;
     }
 
-
-    // set up toggle button
-    // var toggleButton = document.getElementById('toggle');
-    // var whiteBG = true;
-    // var toggleBackground = function(){
-    //     if (whiteBG)
-    //         gl.clearColor(0, 0, 0, 1);
-    //     else
-    //         gl.clearColor(1, 1, 1, 1);
-    //     whiteBG = !whiteBG;
-    //     render(gl, shaderVars, triangle, quad);
-    // }
-    // toggleButton.onclick = toggleBackground;
-    //
-
     // set up left button
     var leftButton = document.getElementById('left');
     var moveLeft = function(){
-        triangle.xTranslate -= 0.1;
-        render(gl, shaderVars, triangle, quad);
+        scale -= 0.1;
+        console.log(scale);
+        render(gl, shaderVars,  quad_points, quad_lines, quad_line_strip,
+            quad_line_loop, quad_triangles,
+            quad_triangle_fan, quad_triangle_strip);
     }
     leftButton.onclick = moveLeft;
 
     // set up right button
     var rightButton = document.getElementById('right');
     var moveRight = function(){
-        triangle.xTranslate += 0.1;
-        render(gl, shaderVars, triangle, quad);
+        scale += 0.1;
+        console.log(scale);
+        render(gl, shaderVars,  quad_points, quad_lines, quad_line_strip,
+            quad_line_loop, quad_triangles,
+            quad_triangle_fan, quad_triangle_strip);
     }
     rightButton.onclick = moveRight;
 
@@ -194,14 +190,16 @@ function main() {
     }
 
     // set up models
-    var n = initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
+    var n = initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip,
+        quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
     if (n < 0) {
         console.log('Failed to initialize models');
         return;
     }
 
     // draw first time - subsequent draws are event driven
-    render(gl, shaderVars,  quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
+    render(gl, shaderVars,  quad_points, quad_lines, quad_line_strip,
+        quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip);
 }
 
 /**
@@ -216,7 +214,9 @@ function main() {
  * @param {Object} quad_triangle_fan - the triangle to be rendered
  * @param {Object} quad_triangle_strip - the triangle to be rendered
  */
-function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip) {
+function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip,
+                quad_line_loop, quad_triangles,
+                quad_triangle_fan, quad_triangle_strip) {
 
     gl.clearColor(1, 1, 1, 1);
 
@@ -225,8 +225,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_points
     gl.uniform4f(shaderVars.u_Color, 0, .3, .7, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_points.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_points.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_points.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_points.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_points.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -234,8 +234,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_lines
     gl.uniform4f(shaderVars.u_Color, 0, .4, .6, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_lines.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_lines.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_lines.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_lines.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_lines.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -243,8 +243,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_line_strip
     gl.uniform4f(shaderVars.u_Color, 0, .5, .5, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_line_strip.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_line_strip.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_line_strip.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_line_strip.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_strip.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -252,8 +252,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_line_loop
     gl.uniform4f(shaderVars.u_Color, 0, .6, .4, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_line_loop.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_line_loop.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_line_loop.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_line_loop.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_line_loop.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -261,8 +261,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_triangles
     gl.uniform4f(shaderVars.u_Color, 0, .7, .3, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_triangles.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_triangles.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_triangles.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_triangles.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangles.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -270,8 +270,8 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_triangle_fan
     gl.uniform4f(shaderVars.u_Color, 0, .8, .2, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_fan.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_fan.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_fan.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_fan.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_fan.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -279,8 +279,10 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
 
     // draw quad_triangle_strip
     gl.uniform4f(shaderVars.u_Color, 0, .9, .1, 1);
-    gl.uniform1f(shaderVars.u_xTranslate, quad_triangle_strip.xTranslate);
-    gl.uniform1f(shaderVars.u_yTranslate, quad_triangle_strip.yTranslate);
+    gl.uniform1f(shaderVars.u_xTranslate,
+        quad_triangle_strip.xTranslate * scale);
+    gl.uniform1f(shaderVars.u_yTranslate,
+        quad_triangle_strip.yTranslate * scale);
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_strip.buffer);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
@@ -301,7 +303,9 @@ function render(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_l
  * @param {Object} quad_triangle_strip - the quad to be rendered
  * @returns {Boolean}
  */
-function initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip, quad_line_loop, quad_triangles, quad_triangle_fan, quad_triangle_strip) {
+function initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip,
+                    quad_line_loop, quad_triangles,
+                    quad_triangle_fan, quad_triangle_strip) {
 
     // set up the quad
     quad_points.buffer = gl.createBuffer();
@@ -376,7 +380,8 @@ function initModels(gl, shaderVars, quad_points, quad_lines, quad_line_strip, qu
         return false;
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, quad_triangle_strip.buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, quad_triangle_strip.vertices, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,
+        quad_triangle_strip.vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
         shaderVars.a_Position, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderVars.a_Position);
