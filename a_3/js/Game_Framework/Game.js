@@ -80,7 +80,7 @@ var World = (function () {
             '}\n';
     }
     World.prototype.init = function (gl) {
-        World.prototype.program = gl.createProgram();
+        // World.prototype.program = gl.createProgram();
     };
     World.prototype.update = function (delta) {
     };
