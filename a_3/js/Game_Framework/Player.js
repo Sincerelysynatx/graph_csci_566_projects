@@ -1,38 +1,37 @@
-class Player{
-    constructor(x, y){
-        this.x = x;
-        this.y = y;
-    }
 
-    init(){
+function Player(x, y){
+    // this.model_verticies = new Float32Array([]);
+    this.x = x;
+    this.y = y;
 
-    }
+    this.init = function(){
 
-    update(delta){
+    };
 
-    }
+    this.update = function(delta){
 
-    render(gl){
+    };
 
-    }
+    this.render = function(gl){
+
+    };
 }
 
+// class Player{
+//     constructor(x, y){
+//         this.x = x;
+//         this.y = y;
+//     }
 //
-// function Player(x, y){
-//     // this.model_verticies = new Float32Array([]);
-//     this.x = x;
-//     this.y = y;
+//     init(){
 //
-//     this.init = function(){
+//     }
 //
-//     };
+//     update(delta){
 //
-//     this.update = function(){
+//     }
 //
-//     };
+//     render(gl){
 //
-//     this.render = function(gl){
-//
-//     };
-//
+//     }
 // }
