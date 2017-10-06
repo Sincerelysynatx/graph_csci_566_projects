@@ -11,35 +11,28 @@
 <body onload="main()">
 <div class="center-align">
     <h4>Instructions:</h4>
-    <h5></h5>
+    <h5>Press button or spacebar to jump</h5>
     <h4>Goal:</h4>
-    <h5></h5>
+    <h5>Jump as many blocks as you can</h5>
 </div>
 <div class="row">
-    <canvas class="col center-align s4 offset-s4" id="webgl" width="400"
+    <canvas class="col center-align m4 offset-m4 s12" id="webgl" width="400"
             height="400">
         Please use a browser that supports "canvas"
     </canvas>
 </div>
-
-
-<!--<div class="row">-->
-    <!--<div class="col s4 offset-s4">-->
-        <!--<div class="card blue-grey darken-1">-->
-            <!--<div class="card-content white-text">-->
-                <!--<span class="card-title">PS</span>-->
-                <!--<p>My other project I was working on didn't pan out, so this is my fallback project.</p>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
+<div class="row center-align">
+    <a class="hide-on-med-and-up waves-effect waves-light btn-large" onclick="jump()">JUMP!</a>
+</div>
+<div class="center-align">
+    <h1 id="score">0</h1>
+</div>
 
     <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
     <script src="lib/cuon-utils.js"></script>
-    <script src="js/Game_Framework/Game.js"></script>
-    <script src="js/Game_Framework/World.js"></script>
-    <script src="js/Game_Framework/Player.js"></script>
+    <script src="lib/cuon-matrix.js"></script>
+    <script src="a_3.js"></script>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="js/materialize.min.js"></script>
