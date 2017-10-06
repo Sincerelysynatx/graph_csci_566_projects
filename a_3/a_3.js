@@ -168,13 +168,13 @@ function main() {
         if (!game_over){
             checkGameOver(rope, player);
 
-            rope.currentAngle = animateRope(rope.currentAngle);  // Update the rotation angle
+            rope.currentAngle = animateRope(rope.currentAngle);
 
             if (player.jumping)
                 animateJump(player);
 
-            draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position);   // Draw the triangle
-            requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
+            draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position);
+            requestAnimationFrame(tick, canvas);
         }
     };
     tick();
