@@ -1,16 +1,26 @@
 /**
  * a_3.js
- * @fileoverview Demonstrates different kinds of rendering while having user
- * inputs. Not that creative, looking forward to the next project.
+ * @fileoverview Demonstrate transformations, animations, and having fun!
  * @author Sean Pimentel
  */
 
 "use strict";
 
+/**
+ * @type {boolean}  for determining if the game is over
+ * @type {int}      for keeping track of the score
+ * @type {boolean}  for determining if a point is already been added
+ */
 var game_over = false;
 var score = 1;
 var should_add = true;
 
+/**
+ * Rope Object
+ * @type {{verticies: Float32Array,
+ *      n: number, buffer: number, speed: number,
+ *      currentAngle: number, modelMatrix: Matrix4}}
+ */
 var rope = {
     verticies: new Float32Array([
         0.05, 0.05
@@ -25,6 +35,12 @@ var rope = {
     modelMatrix: new Matrix4()
 };
 
+/**
+ * Player Object
+ * @type {{verticies: Float32Array, n: number, buffer: number,
+ *      jumping: boolean, velocity: number, gravity: number,
+ *      jump_height: number, modelMatrix: Matrix4}}
+ */
 var player = {
     verticies: new Float32Array([
         0.1, 0.1
@@ -40,8 +56,11 @@ var player = {
     ,jump_height: 0
     ,modelMatrix : new Matrix4()
 };
-// RotatingTranslatedTriangle.js (c) 2012 matsuda
-// Vertex shader program
+
+/**
+ * Vertex Shader
+ * @type {string}
+ */
 var VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
     'uniform mat4 u_ModelMatrix;\n' +
@@ -49,7 +68,10 @@ var VSHADER_SOURCE =
     '   gl_Position = u_ModelMatrix * a_Position;\n' +
     '}\n';
 
-// Fragment shader program
+/**
+ * Fragment Shader
+ * @type {string}
+ */
 var FSHADER_SOURCE =
     'precision mediump float;\n' +
     'uniform vec4 u_Color;\n' +
@@ -60,6 +82,10 @@ var FSHADER_SOURCE =
 // Rotation angle (degrees/second)
 var ANGLE_STEP = 60.0;
 
+/**
+ * Initializes the buffers and starts the rendering loop
+ * @returns {number}
+ */
 function main() {
     // Retrieve <canvas> element
     var canvas = document.getElementById('webgl');
@@ -154,6 +180,17 @@ function main() {
     tick();
 }
 
+/**
+ * Responsible for rendering the rope and player using model matricies for
+ *  applying transformations
+ *
+ * @param gl            rendering context
+ * @param rope          rope object
+ * @param player        player object
+ * @param u_ModelMatrix model matrix location on gpu
+ * @param u_Color       color location on gpu
+ * @param a_Position    position matrix on gpu
+ */
 function draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position) {
     // Clear <canvas>
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -185,8 +222,13 @@ function draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position) {
     gl.drawArrays(gl.TRIANGLE_FAN, 0, player.n);
 }
 
-// Last time that this function was called
 var g_last = Date.now();
+
+/**
+ * Animates the rope and checks if point should be awarded
+ * @param angle
+ * @returns {*} new angle to rotate rope by
+ */
 function animateRope(angle) {
     // Calculate the elapsed time
     var now = Date.now();
@@ -207,6 +249,11 @@ function animateRope(angle) {
     return newAngle;
 }
 
+/**
+ * Animates the players jump
+ * @param player
+ * @returns {number}
+ */
 function animateJump(player) {
     // Calculate the elapsed time
     var now = Date.now();
@@ -225,12 +272,21 @@ function animateJump(player) {
     player.jump_height = new_jump;
 }
 
+/**
+ * Checks if the locations of the rope and player collide
+ *  and game should be over
+ * @param rope
+ * @param player
+ */
 function checkGameOver(rope, player){
     if (rope.currentAngle > 255 && rope.currentAngle < 285 && player.jump_height < 0.05){
         game_over = true;
     }
 }
 
+/**
+ * Sets the players jumping status and gives a velocity to the player
+ */
 function jump(){
     if (!player.jumping){
         player.jumping = true;
