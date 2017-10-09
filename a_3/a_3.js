@@ -14,6 +14,7 @@
 var game_over = false;
 var score = 1;
 var should_add = true;
+var g_last = Date.now();
 
 /**
  * Rope Object
@@ -52,7 +53,7 @@ var player = {
     ,buffer: 0
     ,jumping: false
     ,velocity: 0
-    ,gravity: -0.0015
+    ,gravity: -5.0
     ,jump_height: 0
     ,modelMatrix : new Matrix4()
 };
@@ -166,12 +167,15 @@ function main() {
     // Start drawing
     var tick = function() {
         if (!game_over){
+            var g_now = Date.now();
+            var delta = g_now - g_last;
+            g_last = g_now;
             checkGameOver(rope, player);
 
-            rope.currentAngle = animateRope(rope.currentAngle);
+            animateRope(rope, delta);
 
             if (player.jumping)
-                animateJump(player);
+                animateJump(player, delta);
 
             draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position);
             requestAnimationFrame(tick, canvas);
@@ -222,31 +226,25 @@ function draw(gl, rope, player, u_ModelMatrix, u_Color, a_Position) {
     gl.drawArrays(gl.TRIANGLE_FAN, 0, player.n);
 }
 
-var g_last = Date.now();
-
 /**
  * Animates the rope and checks if point should be awarded
  * @param angle
  * @returns {*} new angle to rotate rope by
  */
-function animateRope(angle) {
-    // Calculate the elapsed time
-    var now = Date.now();
-    var elapsed = now - g_last;
-    g_last = now;
+function animateRope(rope, delta) {
     // Update the current rotation angle (adjusted by the elapsed time)
-    var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0;
+    var newAngle = rope.currentAngle + (ANGLE_STEP * delta) / 1000.0;
     newAngle %= 360;
     ANGLE_STEP += 0.15;
 
-    if (newAngle < 10 && newAngle > 0)
+    if (newAngle < 269 && newAngle > 0)
         should_add = true;
 
     if (!game_over && should_add && newAngle > 270) {
         $('#score').html(score++);
         should_add = false;
     }
-    return newAngle;
+    rope.currentAngle = newAngle;
 }
 
 /**
@@ -254,16 +252,11 @@ function animateRope(angle) {
  * @param player
  * @returns {number}
  */
-function animateJump(player) {
-    // Calculate the elapsed time
-    var now = Date.now();
-    g_last = now;
-
+function animateJump(player, delta) {
     var new_jump;
     if (player.jump_height >= 0){
-        new_jump = player.jump_height + player.velocity;
-        player.velocity += player.gravity;
-        console.log(new_jump);
+        new_jump = player.jump_height + (player.velocity * delta / 1000.0);
+        player.velocity += player.gravity * delta / 1000.0;
     } else {
         player.jumping = false;
         return 0;
@@ -290,7 +283,7 @@ function checkGameOver(rope, player){
 function jump(){
     if (!player.jumping){
         player.jumping = true;
-        player.velocity = .03;
-        player.jump_height += player.velocity;
+        player.velocity = 2;
+        player.jump_height = 0;
     }
 }
