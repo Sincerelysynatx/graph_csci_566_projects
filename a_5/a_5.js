@@ -109,11 +109,6 @@ function main(){
         ,angle: 270
     };
 
-    // var viewProjMatrix = new Matrix4();
-    // viewProjMatrix.setPerspective(60.0, canvas.width/canvas.height, 1.0, 100.0);
-    // viewProjMatrix.lookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
-
-
     var mvp = {
         viewMat: new Matrix4()
         ,projMat: new Matrix4()
@@ -171,6 +166,32 @@ function main(){
         ,trans: new Vector3([0.0, 0.0, 0.0])
         ,rot: new Vector3([0.0, 1.0, 0.0])
     };
+    var building5 = {
+        location: new Vector3([0.0, -3.0, 20.0])
+        ,scale: new Vector3([5.0, 10.0, 5.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+    var building6 = {
+        location: new Vector3([-7.25, -3.0, 20.0])
+        ,scale: new Vector3([2.5, 5.0, 2.5])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+    var building7 = {
+        location: new Vector3([50.0, -3.0, 0.0])
+        ,scale: new Vector3([10.0, 50.0, 10.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var building8 = {
+        location: new Vector3([-50.0, -3.0, 20.0])
+        ,scale: new Vector3([10.0, 50.0, 10.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
 
     var rotation = 0.0;
     var tick = function () {
@@ -193,6 +214,10 @@ function main(){
         drawSolidCube(gl, solidProgram, block, building2.location, building2.trans, building2.scale, building2.rot, 20, 0, mvp.both, 0, 0);
         drawSolidCube(gl, solidProgram, block, building3.location, building3.trans, building3.scale, building3.rot, 20 + 90, 0, mvp.both, 0, 0);
         drawSolidCube(gl, solidProgram, block, building4.location, building4.trans, building4.scale, building4.rot, 20 + 180, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building5.location, building5.trans, building5.scale, building5.rot, 0, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building6.location, building6.trans, building6.scale, building6.rot, 180, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building7.location, building7.trans, building7.scale, building7.rot, 270, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building8.location, building8.trans, building8.scale, building8.rot, 270, 0, mvp.both, 0, 0);
 
         // drawSolidCube(gl, solidProgram, cube, cube1.trans, cube1.scale, windmillRotation, viewProjMatrix);
         // console.log(cube1.trans);
