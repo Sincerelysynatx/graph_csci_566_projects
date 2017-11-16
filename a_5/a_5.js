@@ -1,3 +1,11 @@
+/**
+ * Assignment 5: Create a virtual landscape that the user can wander around on.
+ *      Place a rotating windmill on the ground, along with some buildings.
+ *
+ * @author Sean Pimentel
+ * @date 11-16-17
+ */
+
 // Vertex shader for solid drawing
 var SOLID_VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
@@ -55,28 +63,35 @@ function main(){
         return;
     }
 
-    var solidProgram = createProgram(gl, SOLID_VSHADER_SOURCE, SOLID_FSHADER_SOURCE);
-    var texProgram = createProgram(gl, TEXTURE_VSHADER_SOURCE, TEXTURE_FSHADER_SOURCE);
+    var solidProgram = createProgram(gl, SOLID_VSHADER_SOURCE,
+        SOLID_FSHADER_SOURCE);
+    var texProgram = createProgram(gl, TEXTURE_VSHADER_SOURCE,
+        TEXTURE_FSHADER_SOURCE);
     if (!solidProgram || !texProgram) {
         console.log('Failed to intialize shaders.');
         return;
     }
 
-    // Get storage locations of attribute and uniform variables in program object for single color drawing
+    // Get storage locations of attribute and uniform variables in
+    // program object for single color drawing
     solidProgram.a_Position = gl.getAttribLocation(solidProgram, 'a_Position');
     solidProgram.a_Color = gl.getAttribLocation(solidProgram, 'a_Color');
-    solidProgram.u_MvpMatrix = gl.getUniformLocation(solidProgram, 'u_MvpMatrix');
+    solidProgram.u_MvpMatrix = gl.getUniformLocation(solidProgram,
+        'u_MvpMatrix');
 
-    // Get storage locations of attribute and uniform variables in program object for texture drawing
+    // Get storage locations of attribute and uniform variables
+    // in program object for texture drawing
     texProgram.a_Position = gl.getAttribLocation(texProgram, 'a_Position');
     texProgram.a_TexCoord = gl.getAttribLocation(texProgram, 'a_TexCoord');
     texProgram.u_MvpMatrix = gl.getUniformLocation(texProgram, 'u_MvpMatrix');
     texProgram.u_Sampler = gl.getUniformLocation(texProgram, 'u_Sampler');
 
-    if (solidProgram.a_Position < 0 || !solidProgram.u_MvpMatrix || !solidProgram.a_Color ||
+    if (solidProgram.a_Position < 0 || !solidProgram.u_MvpMatrix ||
+        !solidProgram.a_Color ||
         texProgram.a_Position < 0 || texProgram.a_TexCoord < 0 ||
         !texProgram.u_MvpMatrix || !texProgram.u_Sampler) {
-        console.log('Failed to get the storage location of attribute or uniform variable');
+        console.log('Failed to get the storage location of ' +
+            'attribute or uniform variable');
         return;
     }
 
@@ -116,7 +131,8 @@ function main(){
     };
 
     mvp.projMat.setPerspective(60.0, canvas.width/canvas.height, 1.0, 200.0);
-    mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
+    mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x +
+        camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
 
     mvp.both.set(mvp.projMat);
     mvp.both.multiply(mvp.viewMat);
@@ -200,29 +216,51 @@ function main(){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // Draw ground
-        drawTexCube(gl, texProgram, ground_block, texture, ground.trans, ground.scale, 0, mvp.both);
+        drawTexCube(gl, texProgram, ground_block, texture, ground.trans,
+            ground.scale, 0, mvp.both);
 
         // Draw Windmill
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.base.trans, windmill.base.scale, windmill.base.rot, rotation, 0.0, mvp.both, 0, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 0.0, mvp.both, 1, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 90.0, mvp.both, 1, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 180.0, mvp.both, 1, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 270.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location,
+            windmill.base.trans, windmill.base.scale, windmill.base.rot,
+            rotation, 0.0, mvp.both, 0, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location,
+            windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
+            rotation, 0.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location,
+            windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
+            rotation, 90.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location,
+            windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
+            rotation, 180.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location,
+            windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
+            rotation, 270.0, mvp.both, 1, 1);
 
-// gl, program, o, loc, trans, scale, rot, angle, 0, viewProjMatrix, 0, 1
-        drawSolidCube(gl, solidProgram, block, building1.location, building1.trans, building1.scale, building1.rot, 0, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building2.location, building2.trans, building2.scale, building2.rot, 20, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building3.location, building3.trans, building3.scale, building3.rot, 20 + 90, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building4.location, building4.trans, building4.scale, building4.rot, 20 + 180, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building5.location, building5.trans, building5.scale, building5.rot, 0, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building6.location, building6.trans, building6.scale, building6.rot, 180, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building7.location, building7.trans, building7.scale, building7.rot, 270, 0, mvp.both, 0, 0);
-        drawSolidCube(gl, solidProgram, block, building8.location, building8.trans, building8.scale, building8.rot, 270, 0, mvp.both, 0, 0);
-
-        // drawSolidCube(gl, solidProgram, cube, cube1.trans, cube1.scale, windmillRotation, viewProjMatrix);
-        // console.log(cube1.trans);
-        // drawSolidCube(gl, solidProgram, cube, -2.0, windmillRotation, viewProjMatrix);
-        // drawTexCube(gl, texProgram, cube, texture, 2.0, windmillRotation, viewProjMatrix);
+        // Draw buildings
+        drawSolidCube(gl, solidProgram, block, building1.location,
+            building1.trans, building1.scale, building1.rot, 0, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building2.location,
+            building2.trans, building2.scale, building2.rot, 20, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building3.location,
+            building3.trans, building3.scale, building3.rot, 20 + 90, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building4.location,
+            building4.trans, building4.scale, building4.rot, 20 + 180, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building5.location,
+            building5.trans, building5.scale, building5.rot, 0, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building6.location,
+            building6.trans, building6.scale, building6.rot, 180, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building7.location,
+            building7.trans, building7.scale, building7.rot, 270, 0,
+            mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building8.location,
+            building8.trans, building8.scale, building8.rot, 270, 0,
+            mvp.both, 0, 0);
 
         window.requestAnimationFrame(tick, canvas);
     };
@@ -230,7 +268,12 @@ function main(){
     tick();
 }
 
-
+/**
+ * Handles input and adjusts camera accordingly. Also toggles windmill
+ * @param e
+ * @param camera
+ * @param mvp
+ */
 function moveCamera(e, camera, mvp) {
 
     e = e || window.event;
@@ -271,36 +314,59 @@ function moveCamera(e, camera, mvp) {
 
     mvp.both.set(mvp.projMat);
     mvp.both.multiply(mvp.viewMat);
-    // mvp.both = mvp.projMat.multiply(mvp.viewMat);
 }
 
+/**
+ * Initializes cube buffers
+ * @param gl
+ * @param scale
+ * @returns {*} cube object
+ */
 function initVertexBuffers(gl, scale){
 
     var verticies = new Float32Array([   // Vertex coordinates
-        1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0,    // v0-v1-v2-v3 front
-        1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0,    // v0-v3-v4-v5 right
-        1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0,    // v0-v5-v6-v1 up
-        -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0,    // v1-v6-v7-v2 left
-        -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,  -1.0,-1.0, 1.0,    // v7-v4-v3-v2 down
-        1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0     // v4-v7-v6-v5 back
+        1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,
+        1.0,-1.0, 1.0,    // v0-v1-v2-v3 front
+        1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,
+        1.0, 1.0,-1.0,    // v0-v3-v4-v5 right
+        1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,
+        -1.0, 1.0, 1.0,    // v0-v5-v6-v1 up
+        -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,
+        -1.0,-1.0, 1.0,    // v1-v6-v7-v2 left
+        -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,
+        -1.0,-1.0, 1.0,    // v7-v4-v3-v2 down
+        1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,
+        1.0, 1.0,-1.0     // v4-v7-v6-v5 back
     ]);
 
     var texCoords = new Float32Array([   // Texture coordinates
-        scale, scale,   0.0, scale,   0.0, 0.0,   scale, 0.0,    // v0-v1-v2-v3 front
-        0.0, scale,   0.0, 0.0,   scale, 0.0,   scale, scale,    // v0-v3-v4-v5 right
-        scale, 0.0,   scale, scale,   0.0, scale,   0.0, 0.0,    // v0-v5-v6-v1 up
-        scale, scale,   0.0, scale,   0.0, 0.0,   scale, 0.0,    // v1-v6-v7-v2 left
-        0.0, 0.0,   scale, 0.0,   scale, scale,   0.0, scale,    // v7-v4-v3-v2 down
-        0.0, 0.0,   scale, 0.0,   scale, scale,   0.0, scale     // v4-v7-v6-v5 back
+        scale, scale,   0.0, scale,
+        0.0, 0.0,   scale, 0.0,    // v0-v1-v2-v3 front
+        0.0, scale,   0.0, 0.0,
+        scale, 0.0,   scale, scale,    // v0-v3-v4-v5 right
+        scale, 0.0,   scale, scale,
+        0.0, scale,   0.0, 0.0,    // v0-v5-v6-v1 up
+        scale, scale,   0.0, scale,
+        0.0, 0.0,   scale, 0.0,    // v1-v6-v7-v2 left
+        0.0, 0.0,   scale, 0.0,
+        scale, scale,   0.0, scale,    // v7-v4-v3-v2 down
+        0.0, 0.0,   scale, 0.0,
+        scale, scale,   0.0, scale     // v4-v7-v6-v5 back
     ]);
 
     var colors = new Float32Array([     // Colors
-        0.4, 0.4, 1.0,  0.4, 0.4, 1.0,  0.4, 0.4, 1.0,  0.4, 0.4, 1.0,  // v0-v1-v2-v3 front(blue)
-        0.4, 1.0, 0.4,  0.4, 1.0, 0.4,  0.4, 1.0, 0.4,  0.4, 1.0, 0.4,  // v0-v3-v4-v5 right(green)
-        1.0, 0.4, 0.4,  1.0, 0.4, 0.4,  1.0, 0.4, 0.4,  1.0, 0.4, 0.4,  // v0-v5-v6-v1 up(red)
-        1.0, 1.0, 0.4,  1.0, 1.0, 0.4,  1.0, 1.0, 0.4,  1.0, 1.0, 0.4,  // v1-v6-v7-v2 left
-        1.0, 1.0, 1.0,  1.0, 1.0, 1.0,  1.0, 1.0, 1.0,  1.0, 1.0, 1.0,  // v7-v4-v3-v2 down
-        0.4, 1.0, 1.0,  0.4, 1.0, 1.0,  0.4, 1.0, 1.0,  0.4, 1.0, 1.0   // v4-v7-v6-v5 back
+        0.4, 0.4, 1.0,  0.4, 0.4, 1.0,
+        0.4, 0.4, 1.0,  0.4, 0.4, 1.0,  // v0-v1-v2-v3 front(blue)
+        0.4, 1.0, 0.4,  0.4, 1.0, 0.4,
+        0.4, 1.0, 0.4,  0.4, 1.0, 0.4,  // v0-v3-v4-v5 right(green)
+        1.0, 0.4, 0.4,  1.0, 0.4, 0.4,
+        1.0, 0.4, 0.4,  1.0, 0.4, 0.4,  // v0-v5-v6-v1 up(red)
+        1.0, 1.0, 0.4,  1.0, 1.0, 0.4,
+        1.0, 1.0, 0.4,  1.0, 1.0, 0.4,  // v1-v6-v7-v2 left
+        1.0, 1.0, 1.0,  1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,  1.0, 1.0, 1.0,  // v7-v4-v3-v2 down
+        0.4, 1.0, 1.0,  0.4, 1.0, 1.0,
+        0.4, 1.0, 1.0,  0.4, 1.0, 1.0   // v4-v7-v6-v5 back
     ]);
 
     var indices = new Uint8Array([        // Indices of the vertices
@@ -317,8 +383,10 @@ function initVertexBuffers(gl, scale){
     o.vertexBuffer = initArrayBufferForLaterUse(gl, verticies, 3, gl.FLOAT);
     o.texCoordBuffer = initArrayBufferForLaterUse(gl, texCoords, 2, gl.FLOAT);
     o.colorBuffer = initArrayBufferForLaterUse(gl, colors, 3, gl.FLOAT);
-    o.indexBuffer = initElementArrayBufferForLaterUse(gl, indices, gl.UNSIGNED_BYTE);
-    if (!o.vertexBuffer || !o.texCoordBuffer || !o.indexBuffer || !o.colorBuffer)
+    o.indexBuffer = initElementArrayBufferForLaterUse(gl,
+        indices, gl.UNSIGNED_BYTE);
+    if (!o.vertexBuffer || !o.texCoordBuffer ||
+        !o.indexBuffer || !o.colorBuffer)
         return null;
 
     o.numIndices = indices.length;
@@ -329,6 +397,12 @@ function initVertexBuffers(gl, scale){
     return o;
 }
 
+/**
+ * Initializes textures
+ * @param gl
+ * @param program which program to initialize textures to
+ * @returns {*} returns gl texture
+ */
 function initTextures(gl, program){
     var texture = gl.createTexture();
     if (!texture){
@@ -344,14 +418,12 @@ function initTextures(gl, program){
 
     image.onload = function(){
         // Write the image data to texture object
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);  // Flip the image Y coordinate
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            gl.RGBA, gl.UNSIGNED_BYTE, image);
 
         // Pass the texure unit 0 to u_Sampler
         gl.useProgram(program);
@@ -365,29 +437,59 @@ function initTextures(gl, program){
     return texture;
 }
 
-// gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, mvp.both
-function drawSolidCube(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade, windmill){
+/**
+ * Sets up necessary attribute variables for drawing a solid colored cube
+ * @param gl                webgl context
+ * @param program           which shader program
+ * @param o                 cube object
+ * @param loc               target's location
+ * @param trans             target's translation at location
+ * @param scale             target's scale
+ * @param rot               target's axis to rotate on
+ * @param angle             target's angle to rotate by
+ * @param zrot              windmill rotation around z
+ * @param viewProjMatrix    View Projection Matrix
+ * @param fanBlade          bool if cube is windmill blade
+ * @param windmill          bool if cube is part of windmill
+ */
+function drawSolidCube(gl, program, o, loc, trans, scale, rot,
+                       angle, zrot, viewProjMatrix, fanBlade, windmill){
     gl.useProgram(program);   // Tell that this program object is used
 
     // Assign the buffer objects and enable the assignment
-    initAttributeVariable(gl, program.a_Position, o.vertexBuffer); // Vertex coordinates
+    initAttributeVariable(gl, program.a_Position,
+        o.vertexBuffer); // Vertex coordinates
     initAttributeVariable(gl, program.a_Color, o.colorBuffer);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.indexBuffer);  // Bind indices
 
-    // gl.uniform4f(program.u_Color, color.elements[0], color.elements[1], color.elements[2], 1);
-
     if (windmill)
-        drawCube2(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade);   // Draw
+        drawCube2(gl, program, o, loc, trans, scale, rot,
+            angle, zrot, viewProjMatrix, fanBlade);   // Draw
     else
-        drawCubeBasic(gl, program, o, loc, trans, scale, rot, angle, viewProjMatrix);
+        drawCubeBasic(gl, program, o, loc, trans,
+            scale, rot, angle, viewProjMatrix);
 }
 
-function drawTexCube(gl, program, o, texture, trans, scale, angle, viewProjMatrix) {
+/**
+ * Used for drawing the ground or a textured cube
+ * @param gl                web gl context
+ * @param program           shader program
+ * @param o                 cube object
+ * @param texture           texture to apply
+ * @param trans             target's translation at location
+ * @param scale             target's scale
+ * @param angle             target's angle to rotate by
+ * @param viewProjMatrix    View Projection Matrix
+ */
+function drawTexCube(gl, program, o, texture, trans,
+                     scale, angle, viewProjMatrix) {
     gl.useProgram(program);   // Tell that this program object is used
 
     // Assign the buffer objects and enable the assignment
-    initAttributeVariable(gl, program.a_Position, o.vertexBuffer);  // Vertex coordinates
-    initAttributeVariable(gl, program.a_TexCoord, o.texCoordBuffer);// Texture coordinates
+    initAttributeVariable(gl, program.a_Position,
+        o.vertexBuffer);  // Vertex coordinates
+    initAttributeVariable(gl, program.a_TexCoord,
+        o.texCoordBuffer);// Texture coordinates
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.indexBuffer); // Bind indices
 
     // Bind texture object to texture unit 0
@@ -401,66 +503,130 @@ function drawTexCube(gl, program, o, texture, trans, scale, angle, viewProjMatri
 var g_modelMatrix = new Matrix4();
 var g_mvpMatrix = new Matrix4();
 
+/**
+ * Used for drawing basic cubes not part of the windmill
+ * @param gl                web gl context
+ * @param program           shader program
+ * @param o                 cube object
+ * @param trans             target's translation at location
+ * @param scale             target's scale
+ * @param angle             target's angle to rotate by
+ * @param viewProjMatrix    View Projection Matrix
+ */
 function drawCube(gl, program, o, trans, scale, angle, viewProjMatrix) {
     // Calculate a model matrix
-    g_modelMatrix.setTranslate(trans.elements[0], trans.elements[1], trans.elements[2]);
+    g_modelMatrix.setTranslate(trans.elements[0],
+        trans.elements[1], trans.elements[2]);
     g_modelMatrix.rotate(angle, 0.0, 1.0, 0.0);
-    g_modelMatrix.scale(scale.elements[0], scale.elements[1], scale.elements[2]);
+    g_modelMatrix.scale(scale.elements[0],
+        scale.elements[1], scale.elements[2]);
 
     // Calculate model view projection matrix and pass it to u_MvpMatrix
     g_mvpMatrix.set(viewProjMatrix);
     g_mvpMatrix.multiply(g_modelMatrix);
     gl.uniformMatrix4fv(program.u_MvpMatrix, false, g_mvpMatrix.elements);
 
-    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);   // Draw
+    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);  // Draw
 }
 
-function drawCube2(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade) {
+/**
+ * Used for drawing cube that's a part of windmill
+ * @param gl                webgl context
+ * @param program           which shader program
+ * @param o                 cube object
+ * @param loc               target's location
+ * @param trans             target's translation at location
+ * @param scale             target's scale
+ * @param rot               target's axis to rotate on
+ * @param angle             target's angle to rotate by
+ * @param zrot              windmill rotation around z
+ * @param viewProjMatrix    View Projection Matrix
+ * @param fanBlade          bool if cube is windmill blade
+ */
+function drawCube2(gl, program, o, loc, trans, scale,
+                   rot, angle, zrot, viewProjMatrix, fanBlade) {
     // Calculate a model matrix
-    g_modelMatrix.setTranslate(loc.elements[0], loc.elements[1], loc.elements[2]);
+    g_modelMatrix.setTranslate(loc.elements[0],
+        loc.elements[1], loc.elements[2]);
     if (spin){
-        g_modelMatrix.rotate(angle, rot.elements[0], rot.elements[1], rot.elements[2]);
+        g_modelMatrix.rotate(angle, rot.elements[0],
+            rot.elements[1], rot.elements[2]);
     }
-    g_modelMatrix.translate(trans.elements[0], trans.elements[1], trans.elements[2]);
+    g_modelMatrix.translate(trans.elements[0],
+        trans.elements[1], trans.elements[2]);
     if (fanBlade){
-        g_modelMatrix.translate(-trans.elements[0], -trans.elements[1] + 1.5, -trans.elements[2] );
+        g_modelMatrix.translate(-trans.elements[0],
+            -trans.elements[1] + 1.5, -trans.elements[2] );
         if(shouldRotate)
             g_modelMatrix.rotate(angle + zrot, 0.0, 0.0, 1.0);
         else
             g_modelMatrix.rotate(zrot, 0.0, 0.0, 1.0);
-        g_modelMatrix.translate(trans.elements[0], trans.elements[1] - 2.125, trans.elements[2]);
+        g_modelMatrix.translate(trans.elements[0],
+            trans.elements[1] - 2.125, trans.elements[2]);
     }
-    g_modelMatrix.scale(scale.elements[0], scale.elements[1], scale.elements[2]);
+    g_modelMatrix.scale(scale.elements[0],
+        scale.elements[1], scale.elements[2]);
 
     // Calculate model view projection matrix and pass it to u_MvpMatrix
     g_mvpMatrix.set(viewProjMatrix);
     g_mvpMatrix.multiply(g_modelMatrix);
     gl.uniformMatrix4fv(program.u_MvpMatrix, false, g_mvpMatrix.elements);
 
-    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);   // Draw
+    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);  // Draw
 }
 
-function drawCubeBasic(gl, program, o, loc, trans, scale, rot, angle, viewProjMatrix) {
+/**
+ * Used for drawing basic cubes ie buildings
+ * @param gl                webgl context
+ * @param program           which shader program
+ * @param o                 cube object
+ * @param loc               target's location
+ * @param trans             target's translation at location
+ * @param scale             target's scale
+ * @param rot               target's axis to rotate on
+ * @param angle             target's angle to rotate by
+ * @param viewProjMatrix    View Projection Matrix
+ */
+function drawCubeBasic(gl, program, o, loc, trans,
+                       scale, rot, angle, viewProjMatrix) {
     // Calculate a model matrix
-    g_modelMatrix.setTranslate(loc.elements[0], loc.elements[1], loc.elements[2]);
-    g_modelMatrix.rotate(angle, rot.elements[0], rot.elements[1], rot.elements[2]);
-    g_modelMatrix.translate(trans.elements[0], trans.elements[1], trans.elements[2]);
-    g_modelMatrix.scale(scale.elements[0], scale.elements[1], scale.elements[2]);
+    g_modelMatrix.setTranslate(loc.elements[0],
+        loc.elements[1], loc.elements[2]);
+    g_modelMatrix.rotate(angle, rot.elements[0],
+        rot.elements[1], rot.elements[2]);
+    g_modelMatrix.translate(trans.elements[0],
+        trans.elements[1], trans.elements[2]);
+    g_modelMatrix.scale(scale.elements[0],
+        scale.elements[1], scale.elements[2]);
 
     // Calculate model view projection matrix and pass it to u_MvpMatrix
     g_mvpMatrix.set(viewProjMatrix);
     g_mvpMatrix.multiply(g_modelMatrix);
     gl.uniformMatrix4fv(program.u_MvpMatrix, false, g_mvpMatrix.elements);
 
-    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);   // Draw
+    gl.drawElements(gl.TRIANGLES, o.numIndices, o.indexBuffer.type, 0);  // Draw
 }
 
+/**
+ *
+ * @param gl            Web gl context
+ * @param a_attribute   shader attribute
+ * @param buffer        buffer to apply attribute to
+ */
 function initAttributeVariable(gl, a_attribute, buffer) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(a_attribute, buffer.num, buffer.type, false, 0, 0);
     gl.enableVertexAttribArray(a_attribute);
 }
 
+/**
+ * Initializing and creating array buffer
+ * @param gl        Web gl context
+ * @param data      data to buffer
+ * @param num       buffer number
+ * @param type      type used for later use
+ * @returns {*}     buffer that was created
+ */
 function initArrayBufferForLaterUse(gl, data, num, type){
     var buffer = gl.createBuffer();
 
@@ -478,6 +644,13 @@ function initArrayBufferForLaterUse(gl, data, num, type){
     return buffer;
 }
 
+/**
+ * Initializing and creating an element buffer like for the indices
+ * @param gl        webgl context
+ * @param data      data to buffer
+ * @param type      type used for later use
+ * @returns {*}     buffer that was created
+ */
 function initElementArrayBufferForLaterUse(gl, data, type){
     var buffer = gl.createBuffer();
     if (!buffer) {
@@ -493,6 +666,10 @@ function initElementArrayBufferForLaterUse(gl, data, type){
     return buffer;
 }
 
+/**
+ * Caculate new angle for animation
+ * @param angle angle used for animating
+ */
 var ANGLE_STEP = 30;
 var last = Date.now();
 function animate(angle){
