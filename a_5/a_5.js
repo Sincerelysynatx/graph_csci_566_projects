@@ -42,9 +42,6 @@ var TEXTURE_FSHADER_SOURCE =
     '   gl_FragColor = vec4(color.rgba);\n' +
     '}\n';
 
-var camera;
-var viewProjMatrix;
-
 function main(){
     var canvas = document.getElementById('webgl');
 
@@ -97,9 +94,7 @@ function main(){
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0.019, 0.603, 0.956, 1.0);
 
-    document.onkeydown = function(e){ moveCamera(e, camera, viewProjMatrix)};
-
-    camera = {
+    var camera = {
         dir: {
             x: 0.0
             ,z: -1.0
@@ -111,9 +106,24 @@ function main(){
         ,angle: 270
     };
 
-    viewProjMatrix = new Matrix4();
-    viewProjMatrix.setPerspective(60.0, canvas.width/canvas.height, 1.0, 100.0);
-    viewProjMatrix.lookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
+    // var viewProjMatrix = new Matrix4();
+    // viewProjMatrix.setPerspective(60.0, canvas.width/canvas.height, 1.0, 100.0);
+    // viewProjMatrix.lookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
+
+
+    var mvp = {
+        viewMat: new Matrix4()
+        ,projMat: new Matrix4()
+        ,both: new Matrix4()
+    };
+
+    mvp.projMat.setPerspective(60.0, canvas.width/canvas.height, 1.0, 100.0);
+    mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
+
+    mvp.both.set(mvp.projMat);
+    mvp.both.multiply(mvp.viewMat);
+
+    document.onkeydown = function(e){ moveCamera(e, camera, mvp)};
 
     var windmill = {
         location: new Vector3([0.0, 0.0, 0.0])
@@ -146,11 +156,11 @@ function main(){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // Draw ground
-        drawTexCube(gl, texProgram, ground_block, texture, ground.trans, ground.scale, 0, viewProjMatrix);
+        drawTexCube(gl, texProgram, ground_block, texture, ground.trans, ground.scale, 0, mvp.both);
 
         // Draw Windmill
-        drawSolidCube(gl, solidProgram , block, windmill.base.trans, windmill.base.scale, windmill.base.color, windmillRotation, viewProjMatrix);
-        drawSolidCube(gl, solidProgram , block, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.color, windmillRotation, viewProjMatrix);
+        drawSolidCube(gl, solidProgram , block, windmill.base.trans, windmill.base.scale, windmill.base.color, windmillRotation, mvp.both);
+        drawSolidCube(gl, solidProgram , block, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.color, windmillRotation, mvp.both);
 
         // drawSolidCube(gl, solidProgram, cube, cube1.trans, cube1.scale, windmillRotation, viewProjMatrix);
         // console.log(cube1.trans);
@@ -164,23 +174,27 @@ function main(){
 }
 
 
-function moveCamera(e, camera, viewProjMatrix) {
+function moveCamera(e, camera, mvp) {
 
     e = e || window.event;
 
     if (e.keyCode == '38') {
         // up arrow
+        camera.pos.x += camera.dir.x;
+        camera.pos.z += camera.dir.z;
     }
     else if (e.keyCode == '40') {
+        camera.pos.x -= camera.dir.x;
+        camera.pos.z -= camera.dir.z;
         // down arrow
     }
     else if (e.keyCode == '37') {
-        camera.angle -= 1;
+        camera.angle -= 2;
         camera.angle %= 360;
         // left arrow
     }
     else if (e.keyCode == '39') {
-        camera.angle += 1;
+        camera.angle += 2;
         camera.angle %= 360;
         // right arrow
     }
@@ -188,13 +202,13 @@ function moveCamera(e, camera, viewProjMatrix) {
     camera.dir.x = Math.cos(camera.angle * Math.PI / 180);
     camera.dir.z = Math.sin(camera.angle * Math.PI / 180);
 
-    viewProjMatrix.lookAt(0.0, 0.0, 0.0,
-        camera.dir.x, 0.0, camera.dir.z,
+    mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z,
+        camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z,
         0.0, 1.0, 0.0);
 
-    // gl.uniformMatrix4fv(solidProgram.u_MvpMatrix, false, viewProjMatrix.elements);
-    // gl.uniformMatrix4fv(texProgram.u_MvpMatrix, false, viewProjMatrix.elements);
-
+    mvp.both.set(mvp.projMat);
+    mvp.both.multiply(mvp.viewMat);
+    // mvp.both = mvp.projMat.multiply(mvp.viewMat);
 }
 
 function initVertexBuffers(gl, scale){
@@ -294,7 +308,6 @@ function drawSolidCube(gl, program, o, trans, scale, color, angle, viewProjMatri
     // Assign the buffer objects and enable the assignment
     initAttributeVariable(gl, program.a_Position, o.vertexBuffer); // Vertex coordinates
     initAttributeVariable(gl, program.a_Color, o.colorBuffer);
-    gl.uniformMatrix4fv(program.u_MvpMatrix, false, viewProjMatrix.elements);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.indexBuffer);  // Bind indices
 
     // gl.uniform4f(program.u_Color, color.elements[0], color.elements[1], color.elements[2], 1);
