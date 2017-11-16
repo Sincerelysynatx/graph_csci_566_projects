@@ -120,7 +120,7 @@ function main(){
         ,both: new Matrix4()
     };
 
-    mvp.projMat.setPerspective(60.0, canvas.width/canvas.height, 1.0, 100.0);
+    mvp.projMat.setPerspective(60.0, canvas.width/canvas.height, 1.0, 200.0);
     mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x + camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
 
     mvp.both.set(mvp.projMat);
@@ -129,7 +129,7 @@ function main(){
     document.onkeydown = function(e){ moveCamera(e, camera, mvp)};
 
     var windmill = {
-        location: new Vector3([0.0, 0.0, -10.0])
+        location: new Vector3([10.0, 0.0, -10.0])
         ,base: {
             scale: new Vector3([0.2, 2.0, 0.2])
             ,trans: new Vector3([0.0, 0.0, 0.0])
@@ -142,20 +142,36 @@ function main(){
         }
     };
 
-    // fan1: {
-    //     scale: new Vector3([1.25, 0.2, 0.1])
-    //         ,trans: new Vector3([-1.5, 2.125, 0.5])
-    //         ,rot: new Vector3([0.0, 1.0, 0.0])
-    // }
-
-    // var ground = {
-    //     scale: new Vector3([10.0, 10.0, 1.0])
-    //     ,trans: new Vector3([0.0, 0.0, 5.0])
-    // };
     var ground = {
         scale: new Vector3([100.0, 0.2, 100.0])
         ,trans: new Vector3([0.0, -3.0, 0.0])
     };
+
+    var building1 = {
+        location: new Vector3([-37.0, -3.0, -20.0])
+        ,scale: new Vector3([20.0, 50.0, 20.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+    var building2 = {
+        location: new Vector3([20.0, 1.0, 10.0])
+        ,scale: new Vector3([4.0, 4.0, 4.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+    var building3 = {
+        location: new Vector3([20.0, 7.0, 10.0])
+        ,scale: new Vector3([2.5, 2.5, 2.5])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+    var building4 = {
+        location: new Vector3([20.0, 11.0, 10.0])
+        ,scale: new Vector3([1.5, 1.5, 1.5])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
     var rotation = 0.0;
     var tick = function () {
         rotation = animate(rotation);
@@ -166,12 +182,17 @@ function main(){
         drawTexCube(gl, texProgram, ground_block, texture, ground.trans, ground.scale, 0, mvp.both);
 
         // Draw Windmill
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.base.trans, windmill.base.scale, windmill.base.rot, rotation, 0.0, mvp.both, 0);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 0.0, mvp.both, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 90.0, mvp.both, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 180.0, mvp.both, 1);
-        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 270.0, mvp.both, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.base.trans, windmill.base.scale, windmill.base.rot, rotation, 0.0, mvp.both, 0, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 0.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 90.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 180.0, mvp.both, 1, 1);
+        drawSolidCube(gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, 270.0, mvp.both, 1, 1);
 
+// gl, program, o, loc, trans, scale, rot, angle, 0, viewProjMatrix, 0, 1
+        drawSolidCube(gl, solidProgram, block, building1.location, building1.trans, building1.scale, building1.rot, 0, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building2.location, building2.trans, building2.scale, building2.rot, 20, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building3.location, building3.trans, building3.scale, building3.rot, 20 + 90, 0, mvp.both, 0, 0);
+        drawSolidCube(gl, solidProgram, block, building4.location, building4.trans, building4.scale, building4.rot, 20 + 180, 0, mvp.both, 0, 0);
 
         // drawSolidCube(gl, solidProgram, cube, cube1.trans, cube1.scale, windmillRotation, viewProjMatrix);
         // console.log(cube1.trans);
@@ -320,7 +341,7 @@ function initTextures(gl, program){
 }
 
 // gl, solidProgram , block, windmill.location, windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot, rotation, mvp.both
-function drawSolidCube(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade){
+function drawSolidCube(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade, windmill){
     gl.useProgram(program);   // Tell that this program object is used
 
     // Assign the buffer objects and enable the assignment
@@ -330,7 +351,10 @@ function drawSolidCube(gl, program, o, loc, trans, scale, rot, angle, zrot, view
 
     // gl.uniform4f(program.u_Color, color.elements[0], color.elements[1], color.elements[2], 1);
 
-    drawCube2(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade);   // Draw
+    if (windmill)
+        drawCube2(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProjMatrix, fanBlade);   // Draw
+    else
+        drawCubeBasic(gl, program, o, loc, trans, scale, rot, angle, viewProjMatrix);
 }
 
 function drawTexCube(gl, program, o, texture, trans, scale, angle, viewProjMatrix) {
@@ -370,7 +394,6 @@ function drawCube2(gl, program, o, loc, trans, scale, rot, angle, zrot, viewProj
     // Calculate a model matrix
     g_modelMatrix.setTranslate(loc.elements[0], loc.elements[1], loc.elements[2]);
     if (spin){
-        console.log("spinning!");
         g_modelMatrix.rotate(angle, rot.elements[0], rot.elements[1], rot.elements[2]);
     }
     g_modelMatrix.translate(trans.elements[0], trans.elements[1], trans.elements[2]);
