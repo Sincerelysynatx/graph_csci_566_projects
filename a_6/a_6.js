@@ -155,31 +155,10 @@ function main(){
 
     document.onkeydown = function(e){ moveCamera(e, camera, mvp)};
 
-    // var windmill = {
-    //     location: new Vector3([10.0, 0.0, -10.0])
-    //     ,base: {
-    //         scale: new Vector3([0.2, 2.0, 0.2])
-    //         ,trans: new Vector3([0.0, 0.0, 0.0])
-    //         ,rot: new Vector3([0.0, 1.0, 0.0])
-    //     }
-    //     ,fan1: {
-    //         scale: new Vector3([1.25, 0.2, 0.1])
-    //         ,trans: new Vector3([1.5, 2.125, 0.5])
-    //         ,rot: new Vector3([0.0, 1.0, 0.0])
-    //     }
-    // };
-
     var ground = {
         scale: new Vector3([100.0, 0.2, 100.0])
         ,trans: new Vector3([0.0, -3.0, 0.0])
     };
-
-    // var one_block = {
-    //     location: new Vector3([0.0, -3.0, 0.0])
-    //     ,scale: new Vector3([1.0, 1.0, 1.0])
-    //     ,trans: new Vector3([0.0, 1.0, 1.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // }
 
     var building1 = {
         location: new Vector3([0.0, -2.0, -5.0])
@@ -187,55 +166,6 @@ function main(){
         ,trans: new Vector3([0.0, 0.0, 0.0])
         ,rot: new Vector3([0.0, 1.0, 0.0])
     };
-    var building2 = {
-        location: new Vector3([1.0, -2.0, -5.0])
-        ,scale: new Vector3([0.5, 0.5, 0.5])
-        ,trans: new Vector3([0.0, 0.0, 0.0])
-        ,rot: new Vector3([0.0, 1.0, 0.0])
-    };
-    // var building2 = {
-    //     location: new Vector3([20.0, 1.0, 10.0])
-    //     ,scale: new Vector3([4.0, 4.0, 4.0])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    // var building3 = {
-    //     location: new Vector3([20.0, 7.0, 10.0])
-    //     ,scale: new Vector3([2.5, 2.5, 2.5])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    // var building4 = {
-    //     location: new Vector3([20.0, 11.0, 10.0])
-    //     ,scale: new Vector3([1.5, 1.5, 1.5])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    // var building5 = {
-    //     location: new Vector3([0.0, -3.0, 20.0])
-    //     ,scale: new Vector3([5.0, 10.0, 5.0])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    // var building6 = {
-    //     location: new Vector3([-7.25, -3.0, 20.0])
-    //     ,scale: new Vector3([2.5, 5.0, 2.5])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    // var building7 = {
-    //     location: new Vector3([50.0, -3.0, 0.0])
-    //     ,scale: new Vector3([10.0, 50.0, 10.0])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
-    //
-    // var building8 = {
-    //     location: new Vector3([-50.0, -3.0, 20.0])
-    //     ,scale: new Vector3([10.0, 50.0, 10.0])
-    //     ,trans: new Vector3([0.0, 0.0, 0.0])
-    //     ,rot: new Vector3([0.0, 1.0, 0.0])
-    // };
 
 
     var rotation = 0.0;
@@ -248,30 +178,6 @@ function main(){
         drawTexCube(gl, texProgram, ground_block, texture, ground.trans,
             ground.scale, 0, mvp.both);
 
-        // drawTexCube(gl, texProgram, block, texture, one_block.trans,
-        //     one_block.scale, 0, mvp.both);
-
-        // drawSolidCube(gl, solidProgram, block, one_block.location,
-        //     one_block.trans, one_block.scale, one_block.rot, 0,
-        //     mvp.both, 0, 0);
-
-        // Draw Windmill
-        // drawSolidCube(gl, solidProgram , block, windmill.location,
-        //     windmill.base.trans, windmill.base.scale, windmill.base.rot,
-        //     rotation, 0.0, mvp.both, 0, 1);
-        // drawSolidCube(gl, solidProgram , block, windmill.location,
-        //     windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
-        //     rotation, 0.0, mvp.both, 1, 1);
-        // drawSolidCube(gl, solidProgram , block, windmill.location,
-        //     windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
-        //     rotation, 90.0, mvp.both, 1, 1);
-        // drawSolidCube(gl, solidProgram , block, windmill.location,
-        //     windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
-        //     rotation, 180.0, mvp.both, 1, 1);
-        // drawSolidCube(gl, solidProgram , block, windmill.location,
-        //     windmill.fan1.trans, windmill.fan1.scale, windmill.fan1.rot,
-        //     rotation, 270.0, mvp.both, 1, 1);
-
         for (var y = 0; y < 10; y++){
             for (var x = 0; x < 10; x++){
                 var loc = {
@@ -282,39 +188,6 @@ function main(){
                     mvp.both, 0, 0);
             }
         }
-
-        // drawSolidCube(gl, solidProgram, block, building1.location,
-        //                 building1.trans, building1.scale, building1.rot, 0, 0,
-        //                 mvp.both, 0, 0);
-
-        // Draw buildings
-        // drawSolidCube(gl, solidProgram, block, building1.location,
-        //     building1.trans, building1.scale, building1.rot, 0, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building2.location,
-        //     building2.trans, building2.scale, building1.rot, 0, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building2.location,
-        //     building2.trans, building2.scale, building2.rot, 20, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building3.location,
-        //     building3.trans, building3.scale, building3.rot, 20 + 90, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building4.location,
-        //     building4.trans, building4.scale, building4.rot, 20 + 180, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building5.location,
-        //     building5.trans, building5.scale, building5.rot, 0, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building6.location,
-        //     building6.trans, building6.scale, building6.rot, 180, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building7.location,
-        //     building7.trans, building7.scale, building7.rot, 270, 0,
-        //     mvp.both, 0, 0);
-        // drawSolidCube(gl, solidProgram, block, building8.location,
-        //     building8.trans, building8.scale, building8.rot, 270, 0,
-        //     mvp.both, 0, 0);
 
         window.requestAnimationFrame(tick, canvas);
     };
