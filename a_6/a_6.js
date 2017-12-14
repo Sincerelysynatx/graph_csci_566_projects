@@ -1,3 +1,5 @@
+// www.ecst.csuchico.edu/~jprovazek/JohnP6.html
+
 /**
  * Assignment 6: Create a virtual landscape that the user can wander around on.
  *      Place a rotating windmill on the ground, along with some buildings.
@@ -10,17 +12,40 @@
 var SOLID_VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
     'attribute vec4 a_Normal;\n' +
+    'uniform mat4 u_ModelMatrix;\n' +
     'uniform mat4 u_MvpMatrix;\n' +
     'uniform mat4 u_NormalMatrix;\n' +
+    'uniform vec3 u_LightPosition1;\n' +
+    'uniform vec3 u_LightPosition2;\n' +
+    'uniform vec3 u_LightColor1;\n' +
+    'uniform vec3 u_LightColor2;\n' +
+    'uniform vec4 u_Color;\n' +
     'varying vec4 v_Color;\n' +
     'void main() {\n' +
-    '   vec3 lightDirection = vec3(1.0, 1.0, 1.0);\n' +
-    '   vec4 color = vec4(0.7, 0.4, 1.0, 1.0);\n' +
-    '   gl_Position = u_MvpMatrix * a_Position;\n' +
+    // general setup
+    '   vec4 color = u_Color;\n' +// vec4(0.7, 0.4, 1.0, 1.0);\n' +
     '   vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));\n' +
+    '   gl_Position = u_MvpMatrix * a_Position;\n' +
+    // directional light
+    '   vec3 lightDirection = vec3(1.0, 1.0, 1.0);\n' +
     '   float nDotL = max(dot(normal, lightDirection), 0.0);\n' +
-    '   vec3 ambient = vec3(0.2, 0.2, 0.2) + color.rgb * nDotL;\n' +
-    '   v_Color = vec4(ambient , color.a);\n' +
+    // point light 1
+    '   vec4 vertexPosition = u_ModelMatrix * a_Position;\n' +
+    '   vec3 pointLightDirection = normalize(u_LightPosition1 -' +
+    ' vec3(vertexPosition));\n' +
+    '   float nDotLPoint1 = max(dot(pointLightDirection, normal), 0.0);\n' +
+    '   vec3 diffuse = u_LightColor1 * color.rgb * nDotLPoint1;\n' +
+    // point light 2
+    '   vec3 pointLightDirection2 = normalize(u_LightPosition2 -' +
+    ' vec3(vertexPosition));\n' +
+    '   float nDotLPoint2 = max(dot(pointLightDirection2, normal), 0.0);\n' +
+    '   vec3 diffuse2 = u_LightColor2 * color.rgb * nDotLPoint2;\n' +
+    // ambient
+    '   vec3 ambient = vec3(0.25, 0.25, 0.25) * color.rgb;\n' +
+    // all lighting
+    '   v_Color = vec4((0.2 * color.rgb * nDotL) + ambient + diffuse +' +
+    ' diffuse2,' +
+    ' color.a);\n' +
     '}\n';
 
 // Fragment shader for solid drawing
@@ -82,11 +107,23 @@ function main(){
     // program object for single color drawing
     solidProgram.a_Position = gl.getAttribLocation(solidProgram, 'a_Position');
     solidProgram.a_Normal = gl.getAttribLocation(solidProgram, 'a_Normal');
-    solidProgram.a_Color = gl.getAttribLocation(solidProgram, 'a_Color');
     solidProgram.u_MvpMatrix = gl.getUniformLocation(solidProgram,
         'u_MvpMatrix');
     solidProgram.u_NormalMatrix = gl.getUniformLocation(solidProgram,
         'u_NormalMatrix');
+    solidProgram.u_LightPosition1 = gl.getUniformLocation(solidProgram,
+        'u_LightPosition1');
+    solidProgram.u_LightPosition2 = gl.getUniformLocation(solidProgram,
+        'u_LightPosition2');
+    solidProgram.u_ModelMatrix = gl.getUniformLocation(solidProgram,
+        'u_ModelMatrix');
+    solidProgram.u_LightColor1  = gl.getUniformLocation(solidProgram,
+        'u_LightColor1');
+    solidProgram.u_LightColor2  = gl.getUniformLocation(solidProgram,
+        'u_LightColor2');
+    solidProgram.u_Color = gl.getUniformLocation(solidProgram,
+        'u_Color');
+
 
     // Get storage locations of attribute and uniform variables
     // in program object for texture drawing
@@ -96,8 +133,10 @@ function main(){
     texProgram.u_Sampler = gl.getUniformLocation(texProgram, 'u_Sampler');
 
     if (solidProgram.a_Position < 0 || solidProgram.a_Normal < 0 ||
-        !solidProgram.u_MvpMatrix ||
-        !solidProgram.a_Color ||
+        !solidProgram.u_MvpMatrix || !solidProgram.u_NormalMatrix ||
+        !solidProgram.u_LightPosition1 || !solidProgram.u_LightPosition2 ||
+        !solidProgram.u_LightColor1 || !solidProgram.u_LightColor2 ||
+        !solidProgram.u_Color ||
         texProgram.a_Position < 0 || texProgram.a_TexCoord < 0 ||
         !texProgram.u_MvpMatrix || !texProgram.u_Sampler) {
         console.log('Failed to get the storage location of ' +
@@ -105,9 +144,9 @@ function main(){
         return;
     }
 
-    var ground_block = initVertexBuffers(gl, 100.0);
+    var ground_block = initVertexBuffersCube(gl, 100.0);
 
-    var block = initVertexBuffers(gl, 1.0);
+    var block = initVertexBuffersCube(gl, 1.0);
 
     if (!ground_block){
         console.log('Failed to set the vertex information');
@@ -146,6 +185,11 @@ function main(){
         ,both: new Matrix4()
     };
 
+    var lights = {
+        firstLight: true
+        ,secondLight: true
+    };
+
     mvp.projMat.setPerspective(60.0, canvas.width/canvas.height, 1.0, 200.0);
     mvp.viewMat.setLookAt(camera.pos.x, 0.0, camera.pos.z, camera.pos.x +
         camera.dir.x, 0.0, camera.pos.z + camera.dir.z, 0.0, 1.0, 0.0);
@@ -153,55 +197,124 @@ function main(){
     mvp.both.set(mvp.projMat);
     mvp.both.multiply(mvp.viewMat);
 
-    document.onkeydown = function(e){ moveCamera(e, camera, mvp)};
+    document.onkeydown = function(e){ moveCamera(e, camera, mvp, lights)};
 
     var ground = {
         scale: new Vector3([100.0, 0.2, 100.0])
         ,trans: new Vector3([0.0, -3.0, 0.0])
     };
 
-    var building1 = {
-        location: new Vector3([0.0, -2.0, -5.0])
-        ,scale: new Vector3([0.5, 0.5, 0.5])
+    var block1 = {
+        location: new Vector3([3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
         ,trans: new Vector3([0.0, 0.0, 0.0])
         ,rot: new Vector3([0.0, 1.0, 0.0])
     };
 
+    var block2 = {
+        location: new Vector3([3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
+        ,trans: new Vector3([0.0, 2.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var block3 = {
+        location: new Vector3([3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
+        ,trans: new Vector3([0.0, 4.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var block4 = {
+        location: new Vector3([-3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
+        ,trans: new Vector3([0.0, 0.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var block5 = {
+        location: new Vector3([-3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
+        ,trans: new Vector3([0.0, 2.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var block6 = {
+        location: new Vector3([-3.0, -1.5, -8.0])
+        ,scale: new Vector3([1.0, 1.0, 1.0])
+        ,trans: new Vector3([0.0, 4.0, 0.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var light_source_1 = {
+        location: new Vector3([0.0, 0.0, 0.0])
+        ,scale: new Vector3([0.25, 0.25, 0.25])
+        ,trans: new Vector3([0.0, 1.0, -5.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
+
+    var light_source_2 = {
+        location: new Vector3([0.0, 0.0, 0.0])
+        ,scale: new Vector3([0.25, 0.25, 0.25])
+        ,trans: new Vector3([-4.0, 1.0, -3.0])
+        ,rot: new Vector3([0.0, 1.0, 0.0])
+    };
 
     var rotation = 0.0;
-    var tick = function () {
-        // rotation = animate(rotation);
-
+    var tick = function(){
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        rotation = animate(rotation);
 
-        // Draw ground
+        // draw ground
         drawTexCube(gl, texProgram, ground_block, texture, ground.trans,
             ground.scale, 0, mvp.both);
 
-        for (var y = 0; y < 10; y++){
-            for (var x = 0; x < 10; x++){
-                var loc = {
-                    location: new Vector3([0.0 + x, -2.0 + y, -5.0])
-                }
-                drawSolidCube(gl, solidProgram, block, loc.location,
-                    building1.trans, building1.scale, building1.rot, 0, 0,
-                    mvp.both, 0, 0);
-            }
-        }
+        // draw objects
+        drawSolidCube(gl, solidProgram, block, block1.location,
+            block1.trans, block1.scale, block1.rot,
+            rotation, 0, mvp.both, 0, 0, lights, 0);
+
+        drawSolidCube(gl, solidProgram, block, block2.location,
+            block2.trans, block2.scale, block2.rot,
+            rotation + 10, 0, mvp.both, 0, 0, lights, 0);
+
+        drawSolidCube(gl, solidProgram, block, block3.location,
+            block3.trans, block3.scale, block3.rot,
+            rotation + 20, 0, mvp.both, 0, 0, lights), 0;
+
+        drawSolidCube(gl, solidProgram, block, block4.location,
+            block4.trans, block4.scale, block4.rot,
+            rotation, 0, mvp.both, 0, 0, lights, 0);
+
+        drawSolidCube(gl, solidProgram, block, block5.location,
+            block5.trans, block5.scale, block5.rot,
+            rotation + 10, 0, mvp.both, 0, 0, lights, 0);
+
+        drawSolidCube(gl, solidProgram, block, block6.location,
+            block6.trans, block6.scale, block6.rot,
+            rotation + 20, 0, mvp.both, 0, 0, lights, 0);
+
+        // draw light source
+        drawSolidCube(gl, solidProgram, block, light_source_1.location,
+            light_source_1.trans, light_source_1.scale, light_source_1.rot,
+            0, 0, mvp.both, 0, 0, lights, 1);
+
+        drawSolidCube(gl, solidProgram, block, light_source_2.location,
+            light_source_2.trans, light_source_2.scale, light_source_2.rot,
+            0, 0, mvp.both, 0, 0, lights, 1);
 
         window.requestAnimationFrame(tick, canvas);
     };
 
     tick();
 }
-
 /**
  * Handles input and adjusts camera accordingly. Also toggles windmill
  * @param e
  * @param camera
  * @param mvp
  */
-function moveCamera(e, camera, mvp) {
+function moveCamera(e, camera, mvp, lights) {
 
     e = e || window.event;
 
@@ -231,6 +344,15 @@ function moveCamera(e, camera, mvp) {
     else if (e.keyCode == '89') {
         spin = !spin;
     }
+    else if (e.keyCode == '49') {
+        lights.firstLight = !lights.firstLight;
+    }
+    else if (e.keyCode == '50') {
+        lights.secondLight = !lights.secondLight;
+    }
+    else{
+        console.log(e.keyCode);
+    }
 
     camera.dir.x = Math.cos(camera.angle * Math.PI / 180);
     camera.dir.z = Math.sin(camera.angle * Math.PI / 180);
@@ -249,7 +371,7 @@ function moveCamera(e, camera, mvp) {
  * @param scale
  * @returns {*} cube object
  */
-function initVertexBuffers(gl, scale){
+function initVertexBuffersCube(gl, scale){
 
     var verticies = new Float32Array([   // Vertex coordinates
         1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,
@@ -388,31 +510,44 @@ function initTextures(gl, program){
  * @param viewProjMatrix    View Projection Matrix
  * @param fanBlade          bool if cube is windmill blade
  * @param windmill          bool if cube is part of windmill
+ * @param lights
  */
 function drawSolidCube(gl, program, o, loc, trans, scale, rot,
-                       angle, zrot, viewProjMatrix, fanBlade, windmill){
+                       angle, zrot, viewProjMatrix, fanBlade, windmill,
+                       lights, isLight){
     gl.useProgram(program);   // Tell that this program object is used
 
-    if (!loc)
-    {
-        console.log('location not defined!');
-    }
+    gl.uniform4f(program.u_Color, 0.8, 0.7, 0.2, 1.0);
 
+    if (isLight)
+        gl.uniform4f(program.u_Color, 0.0, 0.0, 0.0, 1.0);
+
+    if (lights.firstLight)
+        gl.uniform3f(program.u_LightColor1, 1.0, 1.0, 1.0);
+    else
+        gl.uniform3f(program.u_LightColor1, 0.0, 0.0, 0);
+
+    if (lights.secondLight)
+        gl.uniform3f(program.u_LightColor2, 0.0, 1.0, 0.0);
+    else
+        gl.uniform3f(program.u_LightColor2, 0.0, 0.0, 0);
+
+    gl.uniform3f(program.u_LightPosition1, 0.0, 1.0, 1.0);
+    gl.uniform3f(program.u_LightPosition2, -1.0, 0.0, 1.0);
 
     // Assign the buffer objects and enable the assignment
     initAttributeVariable(gl, program.a_Position,
         o.vertexBuffer); // Vertex coordinates
-    // initAttributeVariable(gl, program.a_Color, o.colorBuffer);
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.indexBuffer);  // Bind indices
+
     initAttributeVariable(gl, program.a_Normal, o.normalBuffer);   // Normal
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.indexBuffer);  // Bind indices
 
-    if (windmill)
-        drawCube2(gl, program, o, loc, trans, scale, rot,
-            angle, zrot, viewProjMatrix, fanBlade);   // Draw
-    else
-        drawCubeBasic(gl, program, o, loc, trans,
-            scale, rot, angle, viewProjMatrix);
+    // if (windmill)
+    //     drawCube2(gl, program, o, loc, trans, scale, rot,
+    //         angle, zrot, viewProjMatrix, fanBlade);   // Draw
+    // else
+    drawCubeBasic(gl, program, o, loc, trans,
+        scale, rot, angle, viewProjMatrix);
 }
 
 /**
